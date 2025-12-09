@@ -7,12 +7,48 @@ const lenis = initSmoothScroll()
 
 // --- Data ---
 const portfolioItems = [
-  { title: "네온 제네시스", category: "VFX / 시뮬레이션", img: "/assets/images/portfolio/work-01.png", video: "/assets/videos/project1.mp4" },
-  { title: "사이버 보이드", category: "모션 그래픽", img: "/assets/images/portfolio/work-02.png", video: "/assets/videos/project2.mp4" },
-  { title: "데이터 플로우", category: "인터랙티브", img: "/assets/images/portfolio/work-03.png", video: "/assets/videos/project3.mp4" },
-  { title: "뉴럴 넷", category: "합성", img: "/assets/images/portfolio/work-04.png", video: "/assets/videos/project4.mp4" },
-  { title: "크로마틱", category: "3D 아트", img: "/assets/images/portfolio/work-05.png", video: "" },
-  { title: "글리치 스톰", category: "실험적", img: "/assets/images/portfolio/work-06.png", video: "" },
+  {
+    title: "네온 제네시스",
+    category: "VFX / 시뮬레이션",
+    img: "assets/images/portfolio/work-01.png",
+    video: "assets/videos/project1.mp4",
+    description: "미래 도시의 네온 사인과 비 내리는 거리를 시뮬레이션한 프로젝트입니다. Houdini를 사용하여 절차적인 도시 생성을 구현하고, Redshift로 렌더링하여 사이버펑크 분위기를 극대화했습니다."
+  },
+  {
+    title: "사이버 보이드",
+    category: "모션 그래픽",
+    img: "assets/images/portfolio/work-02.png",
+    video: "assets/videos/project2.mp4",
+    description: "데이터가 붕괴되는 과정을 추상적으로 표현한 모션 그래픽입니다. Cinema 4D와 After Effects를 활용하여 글리치 효과와 역동적인 타이포그래피를 결합했습니다."
+  },
+  {
+    title: "데이터 플로우",
+    category: "인터랙티브",
+    img: "assets/images/portfolio/work-03.png",
+    video: "assets/videos/project3.mp4",
+    description: "실시간 데이터 시각화 프로젝트로, 사용자의 입력에 따라 흐름이 변화하는 인터랙티브 아트입니다. TouchDesigner를 사용하여 데이터의 유기적인 움직임을 구현했습니다."
+  },
+  {
+    title: "뉴럴 넷",
+    category: "합성",
+    img: "assets/images/portfolio/work-04.png",
+    video: "assets/videos/project4.mp4",
+    description: "인공지능 신경망의 구조를 시각화한 합성 작업입니다. Nuke를 사용하여 복잡한 레이어를 합성하고, 깊이감 있는 룩을 완성했습니다."
+  },
+  {
+    title: "크로마틱",
+    category: "3D 아트",
+    img: "assets/images/portfolio/work-05.png",
+    video: "",
+    description: "빛의 분산과 굴절을 탐구한 3D 아트워크입니다. 다양한 재질과 조명 세팅을 통해 몽환적이고 다채로운 색감을 표현했습니다."
+  },
+  {
+    title: "글리치 스톰",
+    category: "실험적",
+    img: "assets/images/portfolio/work-06.png",
+    video: "",
+    description: "디지털 노이즈와 왜곡을 예술적으로 승화시킨 실험적인 영상입니다. 아날로그 소스를 디지털로 변환하는 과정에서 발생하는 우연한 효과들을 적극 활용했습니다."
+  },
 ]
 
 // --- HTML Injection ---
@@ -178,4 +214,76 @@ document.querySelectorAll('.nav-link').forEach(link => {
       })
     }
   })
+})
+
+// --- Portfolio Modal Logic ---
+
+// Inject Modal HTML
+const modalHTML = `
+  <div id="portfolio-modal" class="portfolio-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div class="modal-body">
+        <div class="modal-media">
+          <img src="" alt="" id="modal-img" />
+          <video src="" id="modal-video" controls style="display: none;"></video>
+        </div>
+        <div class="modal-info">
+          <h3 id="modal-title"></h3>
+          <p id="modal-category"></p>
+          <p id="modal-desc"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+`
+document.body.insertAdjacentHTML('beforeend', modalHTML)
+
+const modal = document.querySelector('#portfolio-modal')
+const modalImg = document.querySelector('#modal-img')
+const modalVideo = document.querySelector('#modal-video')
+const modalTitle = document.querySelector('#modal-title')
+const modalCategory = document.querySelector('#modal-category')
+const modalDesc = document.querySelector('#modal-desc')
+const modalClose = document.querySelector('.modal-close')
+const modalOverlay = document.querySelector('.modal-overlay')
+
+function openModal(item) {
+  modalTitle.textContent = item.title
+  modalCategory.textContent = item.category
+  modalDesc.textContent = item.description
+
+  if (item.video) {
+    modalVideo.src = item.video
+    modalVideo.style.display = 'block'
+    modalImg.style.display = 'none'
+  } else {
+    modalImg.src = item.img
+    modalImg.style.display = 'block'
+    modalVideo.style.display = 'none'
+    modalVideo.pause()
+  }
+
+  modal.classList.add('active')
+  document.body.style.overflow = 'hidden' // Prevent background scrolling
+}
+
+function closeModal() {
+  modal.classList.remove('active')
+  document.body.style.overflow = ''
+  modalVideo.pause()
+}
+
+// Event Listeners
+document.querySelectorAll('.project-card').forEach((card, index) => {
+  card.addEventListener('click', () => {
+    openModal(portfolioItems[index])
+  })
+})
+
+modalClose.addEventListener('click', closeModal)
+modalOverlay.addEventListener('click', closeModal)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal()
 })
